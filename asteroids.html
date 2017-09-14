@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+  <script src="asteroids.js"></script>
+
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="ast_stylesheet.css" media="screen">
+    <title>ASTEROIDS GAME</title>
+  </head>
+
+  <body onload="init()">
+
+        <!-- The Modal -->
+        <div id="myModal" class="modal">
+             <!-- Modal content -->
+            <div class="modal-content">
+              <div class="modal-header">
+                <span class="close" onclick="toContinue()">&times;</span>
+                <h2 align="center" id="msg">ARE U SURE? You will lose all your progress.</h2>
+              </div>
+              <div class="modal-body">
+                <p align="center">
+                   <button onclick="init()" class="boton naranja">Restart</button>
+                   <button onclick="toContinue()" class="boton naranja">continue</button>
+                </p>
+              </div>
+              <div class="modal-footer"></div>
+            </div>
+        </div>
+
+    <div align="center">
+
+        <canvas id="canvas" width="500" height="500">
+          Please use a browser that supports "canvas"
+        </canvas>
+        <div id="rightside">
+            <p id="points">Points: 0</p>
+            <p id="timing"></p>
+            <img id="tips" src="wasd.jpg" width="200px" height="200px"></img>
+        </div>
+        <div id="leftside">
+            <p id="lives">Lives: 3 </p>
+            <button id="restart" onclick="display()"></button>
+        </div>
+    </div>
+  </body>
+</html>
