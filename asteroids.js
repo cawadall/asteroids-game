@@ -1,3 +1,6 @@
+// ASTEROIDS GAME
+
+// Global Variables Declaration
 var shapes, asteroids, bullets;
 var canvas, background;
 var ctx, points, lives, acceleration, ast_counter, angle, c;
@@ -6,12 +9,12 @@ var starthour, ginterval, inerinterval, timeinterval;
 var m;
 var exp_counter = 0;
 
-// Para cuando se abre la página, gestiona el comienzo del juego
+/* Game Initialization */
 function init() {
 
     toContinue();
-    // inicialización de variables globales
-    shapes = []; //array de figuras
+    // Global Variables Initialization
+    shapes = []; // game agents
     asteroids = [];
     bullets = [];
     points = 0;
@@ -25,11 +28,10 @@ function init() {
     clearInterval(ginterval);
     clearInterval(inerinterval);
     clearInterval(timeinterval);
-    /////////////////////////////////////////
 
     canvas = document.getElementById('canvas');
     if (!canvas) {
-    console.log('Failed to retrieve the <canvas> element');
+    console.log('[ERROR] Failed to retrieve the <canvas> element');
     return false;
     }
 
@@ -37,7 +39,7 @@ function init() {
     shapes.push(new SpaceShip("ss", 50, 75, 20, 20, 'rgba(255, 255, 255, 1)'));
     document.addEventListener('keydown', keyHandler, false);
 
-    // gradiente de texto
+    // Text gradient
     var gradient=ctx.createLinearGradient(0,0,canvas.width,0);
     gradient.addColorStop("0","#ffa059");
     gradient.addColorStop("0.5","#ff7913");
@@ -49,22 +51,29 @@ function init() {
     ctx.fillText("Press Space to start",canvas.width/2,canvas.height/2);
 }
 
-// En caso de que se pulse el botón "Continue" del menú
+// Handler of 'Continue' button
 function toContinue() {
     var modal = document.getElementById('myModal');
     modal.style.display = "none"; // oculto la ventana modal
 }
-// Muestra el menú
+// Shows the Menu
 function display() {
     var modal = document.getElementById('myModal');
+    document.getElementById('cnt').style.display = "inline";
+    if (lives <= 0) {
+        console.log("tetas");
+        document.getElementById('cnt').style.display = "none";
+    }
     modal.style.display = "block";
 }
-// Constructor de Naves
+
+/* SpaceShip Constructor */
 function SpaceShip(id, x, y, height, base, color) {
+
     this.id = id;
-    this.x = x; //centro del triángulo
+    this.x = x; // Triangle center
     this.y = y;
-    this.w = 0.0;     // rad/segundo
+    this.w = 0.0;     // rad/seg
     this.theta = 0.0; // rad
     this.height = height;
     this.base = base;
@@ -73,9 +82,7 @@ function SpaceShip(id, x, y, height, base, color) {
     var t = new Date();
     this.time = t.getTime();
 
-
     this.draw = function() {
-
         ctx.save();
         ctx.translate(that.x,that.y);
         ctx.scale(15,15);
@@ -90,24 +97,24 @@ function SpaceShip(id, x, y, height, base, color) {
     }
 
     this.move = function(desp) {
-        // Movimiento en x
+        // Movement along X axis
         that.y = that.y + desp*Math.cos(that.theta);
 
-        if((that.y - that.height/2)<0) // Control de límites del canvas
+        if((that.y - that.height/2)<0) // Canvas Limit control
           that.y = canvas.height;
         if((that.y - that.height/2)>=canvas.height)
           that.y = 0 + that.height/2;
-        // Movimiento en y
+        // Movement along Y axis
         that.x -= desp*Math.sin(that.theta);
 
 
-        if((that.x - that.height/2)<0) // Control de límites del canvas
+        if((that.x - that.height/2)<0) // Canvas Limit control
           that.x = canvas.width;
         if((that.x - that.height/2)>=canvas.width)
           that.x = 0 + that.height/2;
 
         drawShapes();
-      }
+    }
 
     this.rotate = function() {
         var t = new Date();
@@ -116,26 +123,27 @@ function SpaceShip(id, x, y, height, base, color) {
 		that.time = now;
         that.theta += (that.w*(dt/1000.0));
         drawShapes();
-  }
+    }
 }
 
-// Constructor de Asteroides
+/* Asteroids constructor */
 function Asteroid(id, x, y, radious) {
 
     this.id = id;
     this.x = x;
     this.y = y;
-    this.radious = Math.random()*15+5; // aleatorio entre 5 y 20
+    this.radious = Math.random()*15+5; // [5, 20]
     this.color = 'rgba(255, 255, 255, 1)';
 
     do {
-    this.move_x = (2*Math.random()-1)*(4*Math.random()*-2);
-    this.move_y = (2*Math.random()-1)*(4*Math.random()*-2);
+        this.move_x = (2*Math.random()-1)*(4*Math.random()*-2);
+        this.move_y = (2*Math.random()-1)*(4*Math.random()*-2);
     } while (this.move_x == 0 && this.move_y == 0);
 
-    asteroids.push(this.id) //añado a la lista de asteroides 
+    asteroids.push(this.id) // current asteroids list 
 
     this.draw = function() {
+
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radious, 0, 2 * Math.PI, false);
         ctx.fillStyle = this.color;
@@ -155,7 +163,7 @@ function Asteroid(id, x, y, radious) {
     }
 }
 
-// Constructor de Balas
+/* Bullet Constructor */
 function Bullet(ship, id) {
 
     this.id = id;
@@ -184,23 +192,23 @@ function Bullet(ship, id) {
     }
 }
 
-// Pinta todos los objetos de la escena
+// Draws every object in the scene
 function drawShapes() {
-    // limpia todos los objetos y llama a los métodos draw
+    // Clear Canvas and redraw
     ctx.clearRect(0, 0, canvas.width, canvas.height);
    
     for(x in shapes) {
       shapes[x].draw();
     }
 }
-// Devuelve un objeto concreto por su id
+// Get the object with the specified ID
 function getShape(id) {
     for(x in shapes) {
         if(shapes[x].id === id)
             return shapes[x];
     }
 }
-// Elimina un objeto por su id
+// Delete an object with the specified ID
 function delShape(id) {
     for(x in shapes) {
         if(shapes[x].id === id)
@@ -208,7 +216,7 @@ function delShape(id) {
     }
 }
 
-//Animación de los asteroides
+// Asteroids animation
 function asteroids_render() { 
 
     for (var i=0;i<asteroids.length;i++) {
@@ -217,7 +225,7 @@ function asteroids_render() {
         var dx, dy, distance;
 
         if(obj !== undefined)
-        {   //control de límites del canvas
+        {
             obj.moveXaxis(obj.move_x);
             if(obj.x > canvas.width || obj.x < 0)
             {
@@ -230,7 +238,7 @@ function asteroids_render() {
                 delShape(asteroids[i]);
                 asteroids.splice(i,1);
             }
-            // control de impactos
+            // SpaceShip Impact Control
             ship = getShape("ss");
             dx = ship.x - obj.x;
             dy = ship.y - obj.y;
@@ -242,7 +250,7 @@ function asteroids_render() {
                 asteroids.splice(i,1);
                 lives--;
             }
-            // control de impactos con balas
+            // Bullet Impact Control
             if (bullets !== undefined)
             {
                 for (var j=0;j<bullets.length;j++) {
@@ -266,10 +274,10 @@ function asteroids_render() {
 
         drawShapes();
     }
-    status(); //controla el estado del juego
+    status(); // game status control
 }
 
-// Generador de asteroides
+// Asteroids Generator
 function generate_asteroids() {
     var initx = canvas.width/2;
     var inity = canvas.height/2;
@@ -279,14 +287,14 @@ function generate_asteroids() {
 }
 
 
-// Velocidad
+// Inertia and Velocity Control
 function inertia(ship) {
     
     ship.rotate();
     ship.move(desp*acceleration);
 }
 
-// Control de disparos
+// Shooting control
 function shoot() {
 
     for (var i=0; i<bullets.length; i++) {
@@ -311,7 +319,7 @@ function status() {
     {
         display();
         document.getElementById("msg").innerHTML = "GAME OVER :( RETRY!";
-        // reiniciar juego
+        // Restart
     } else {
         document.getElementById('lives').innerHTML = "Lives: " + lives;
     }
@@ -324,7 +332,7 @@ function gameTime() {
 
     var actual = new Date();
     var interval = actual.getTime() - dateMsec;
-    // Calcula horas, minutos y segundos.
+
     var hours = Math.floor(interval / msecPerHour );
     interval = interval - (hours * msecPerHour );
 
@@ -333,11 +341,10 @@ function gameTime() {
 
     var seconds = Math.floor(interval / 1000 );
 
-    // Muestra el resultado
     var hour = hours + " : " + minutes + " : " + seconds;
     document.getElementById("timing").innerHTML = hour;
 
-    //aumenta velocidad de generación de asteroides
+    // Asteroids Generation period increases with time
     if (minutes>m)
     {
         m++;
@@ -346,7 +353,7 @@ function gameTime() {
     }
 }
 
-// Manejador de eventos (pulsar tecla)
+// Keyboard Events Handler
 function keyHandler(event) {
   var obj;
   obj = getShape("ss");
